@@ -39,7 +39,7 @@ def generate_and_save_one_uci_dataset(
     dataset: UCIDataset, inputs: np.ndarray, outputs: np.ndarray
 ) -> None:
     print(f"Generating {dataset.value}")
-    train_inputs, train_targets, test_inputs, test_targets = train_test_split(
+    train_inputs, test_inputs, train_targets, test_targets = train_test_split(
         inputs, outputs, train_size=0.9
     )
     dataset_path = UCI_DATASETS_PATH / dataset.value
