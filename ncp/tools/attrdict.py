@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 class AttrDict(dict):
 
-  __getattr__ = dict.__getitem__
-  __setattr__ = dict.__setitem__
+    __getattr__ = dict.__getitem__
+    __setattr__ = dict.__setitem__

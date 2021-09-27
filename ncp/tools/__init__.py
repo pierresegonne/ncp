@@ -13,8 +13,5 @@
 # limitations under the License.
 
 from .attrdict import AttrDict
-from .plotting import plot_distance
-from .plotting import plot_likelihood
-from .plotting import visualize_model
-from .training import load_results
-from .training import run_experiment
+from .plotting import plot_distance, plot_likelihood, visualize_model
+from .training import load_results, run_experiment

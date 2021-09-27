@@ -1,10 +1,11 @@
 import argparse
 import itertools
-from ncp.datasets.uci import UCIDataset
 import os
 import warnings
 
 import matplotlib as mpl
+
+from ncp.datasets.uci import UCIDataset
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
@@ -13,9 +14,8 @@ import tensorflow.compat.v1 as tf
 
 tf.disable_v2_behavior()
 
-from ncp import datasets
-from ncp import models
-from ncp import tools
+from ncp import datasets, models, tools
+
 
 # TODO - check config
 def default_schedule(model):

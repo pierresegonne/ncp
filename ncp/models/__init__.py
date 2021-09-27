@@ -12,7 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from . import bbb
-from . import bbb_ncp
-from . import det
-from . import det_mix_ncp
+from . import bbb, bbb_ncp, det, det_mix_ncp

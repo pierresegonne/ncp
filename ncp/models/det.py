@@ -12,40 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from tensorflow_probability import distributions as tfd
 import tensorflow as tf
+from tensorflow_probability import distributions as tfd
 
 from ncp import tools
 
 
 def network(inputs, config):
-  hidden = inputs
-  for size in config.layer_sizes:
-    hidden = tf.layers.dense(hidden, size, tf.nn.leaky_relu)
-  mean = tf.layers.dense(hidden, 1)
-  std = tf.layers.dense(hidden, 1, tf.nn.softplus) + 1e-6
-  data_dist = tfd.Normal(mean, std)
-  return data_dist
+    hidden = inputs
+    for size in config.layer_sizes:
+        hidden = tf.layers.dense(hidden, size, tf.nn.leaky_relu)
+    mean = tf.layers.dense(hidden, 1)
+    std = tf.layers.dense(hidden, 1, tf.nn.softplus) + 1e-6
+    data_dist = tfd.Normal(mean, std)
+    return data_dist
 
 
 def define_graph(config):
-  network_tpl = tf.make_template('network', network, config=config)
-  inputs = tf.placeholder(tf.float32, [None, config.num_inputs])
-  targets = tf.placeholder(tf.float32, [None, 1])
-  num_visible = tf.placeholder(tf.int32, [])
-  batch_size = tf.shape(inputs)[0]
-  data_dist = network_tpl(inputs)
-  losses = [
-      -data_dist.log_prob(targets),
-  ]
-  loss = sum(tf.reduce_sum(loss) for loss in losses) / tf.to_float(batch_size)
-  optimizer = tf.train.AdamOptimizer(config.learning_rate)
-  gradients, variables = zip(*optimizer.compute_gradients(
-      loss, colocate_gradients_with_ops=True))
-  if config.clip_gradient:
-    gradients, _ = tf.clip_by_global_norm(gradients, config.clip_gradient)
-  optimize = optimizer.apply_gradients(zip(gradients, variables))
-  data_mean = data_dist.mean()
-  data_noise = data_dist.stddev()
-  data_uncertainty = data_dist.stddev()
-  return tools.AttrDict(locals())
+    network_tpl = tf.make_template("network", network, config=config)
+    inputs = tf.placeholder(tf.float32, [None, config.num_inputs])
+    targets = tf.placeholder(tf.float32, [None, 1])
+    num_visible = tf.placeholder(tf.int32, [])
+    batch_size = tf.shape(inputs)[0]
+    data_dist = network_tpl(inputs)
+    losses = [
+        -data_dist.log_prob(targets),
+    ]
+    loss = sum(tf.reduce_sum(loss) for loss in losses) / tf.to_float(batch_size)
+    optimizer = tf.train.AdamOptimizer(config.learning_rate)
+    gradients, variables = zip(
+        *optimizer.compute_gradients(loss, colocate_gradients_with_ops=True)
+    )
+    if config.clip_gradient:
+        gradients, _ = tf.clip_by_global_norm(gradients, config.clip_gradient)
+    optimize = optimizer.apply_gradients(zip(gradients, variables))
+    data_mean = data_dist.mean()
+    data_noise = data_dist.stddev()
+    data_uncertainty = data_dist.stddev()
+    return tools.AttrDict(locals())

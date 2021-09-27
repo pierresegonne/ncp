@@ -18,17 +18,17 @@ from ncp import tools
 
 
 def generate_vargrad_dataset(length=1000, noise_slope=0.2):
-  random = np.random.RandomState(0)
-  inputs = np.linspace(-1, 1, length)
-  noise_std = np.maximum(0, (inputs + 1) * noise_slope)
-  targets = 0.5 * + np.sin(25 * inputs) + random.normal(0, noise_std)
-  targets += 0.5 * inputs
-  domain = np.linspace(-1.2, 1.2, 1000)
-  train_split = np.repeat([False, True, False, True, False], 200)
-  test_split = (1 - train_split).astype(bool)
-  domain, inputs, targets = domain[:, None], inputs[:, None], targets[:, None]
-  test_inputs, test_targets = inputs[test_split], targets[test_split]
-  train_inputs, train_targets = inputs[train_split], targets[train_split]
-  train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
-  test = tools.AttrDict(inputs=test_inputs, targets=test_targets)
-  return tools.AttrDict(domain=domain, train=train, test=test, target_scale=1)
+    random = np.random.RandomState(0)
+    inputs = np.linspace(-1, 1, length)
+    noise_std = np.maximum(0, (inputs + 1) * noise_slope)
+    targets = 0.5 * +np.sin(25 * inputs) + random.normal(0, noise_std)
+    targets += 0.5 * inputs
+    domain = np.linspace(-1.2, 1.2, 1000)
+    train_split = np.repeat([False, True, False, True, False], 200)
+    test_split = (1 - train_split).astype(bool)
+    domain, inputs, targets = domain[:, None], inputs[:, None], targets[:, None]
+    test_inputs, test_targets = inputs[test_split], targets[test_split]
+    train_inputs, train_targets = inputs[train_split], targets[train_split]
+    train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
+    test = tools.AttrDict(inputs=test_inputs, targets=test_targets)
+    return tools.AttrDict(domain=domain, train=train, test=test, target_scale=1)
