@@ -14,4 +14,5 @@
 
 from .numpy_dataset import load_numpy_dataset
 from .toy import generate_vargrad_dataset
+from .toy_ours import generate_toy_ours_dataset
 from .uci import UCI_DATASETS_PATH, UCIDataset
