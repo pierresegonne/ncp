@@ -14,8 +14,8 @@ def generate_toy_ours_dataset():
 
     training_range = [0, 10]
     testing_range = [0, 10]
-    N_train = 10
-    N_test = 100
+    N_train = 625
+    N_test = 500
     x_train = np.random.uniform(
         low=training_range[0], high=training_range[1], size=N_train
     )
