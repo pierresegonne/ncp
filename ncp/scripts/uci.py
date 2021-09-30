@@ -21,15 +21,11 @@ from ncp import datasets, models, tools
 def default_schedule(model):
     config = tools.AttrDict()
     config.num_epochs = 200
-    config.num_initial = 501  # 10
-    config.num_select = 1
-    config.select_after_epochs = range(1000, 5000, 100)  # range(1000, 50000, 1000)
-    config.eval_after_epochs = range(0, 5000, 10)
-    config.log_after_epochs = range(0, 5000, 10)
-    config.visualize_after_epochs = range(0, 5000, 10)
+    _range = range(0, config.num_epochs + 1, 50)
+    config.eval_after_epochs = _range
+    config.log_after_epochs = _range
+    config.visualize_after_epochs = _range
     config.batch_size = 10
-    config.temperature = 0.5
-    config.evaluate_unseen_train = True
     config.filetype = "pdf"
     if model == "det":
         config.has_uncertainty = False
@@ -39,7 +35,7 @@ def default_schedule(model):
 # TODO - check config
 def default_config(model):
     config = tools.AttrDict()
-    config.num_inputs = 1
+    config.num_inputs = 1  # This must be overriden based on the uci experiment
     config.layer_sizes = [50, 50]  # [200, 200]  # [50, 50]
     if model == "bbb":
         config.divergence_scale = 0.1
@@ -102,6 +98,8 @@ def main(args):
         for seed, (model, define_graph) in experiments:
             schedule = globals()[args.schedule](model)
             config = globals()[args.config](model)
+            # Override num_inputs based on dataset
+            config.num_inputs = dataset.train.inputs.shape[1]
             logdir = os.path.join(
                 f"{args.logdir}/{dataset_to_run}", "{}-{}".format(model, seed)
             )
