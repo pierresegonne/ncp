@@ -38,7 +38,9 @@ UCI_DATASETS_PATH = pathlib.Path(__file__).parent.resolve() / "uci"
 def generate_and_save_one_uci_dataset(
     dataset: UCIDataset, inputs: np.ndarray, outputs: np.ndarray
 ) -> None:
-    print(f"Generating {dataset.value}")
+    print(
+        f"Generating {dataset.value} - [{inputs.shape}, {outputs.shape}]"
+    )
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(
         inputs, outputs, train_size=0.9
     )
@@ -66,7 +68,7 @@ def _generate_uci_from_csv(
         x = df.drop(columns=[target_column]).to_numpy()
     else:
         x = df[input_columns].to_numpy()
-    y = df[target_column].to_numpy()
+    y = df[[target_column]].to_numpy()
     generate_and_save_one_uci_dataset(dataset, x, y)
 
 
@@ -83,7 +85,7 @@ def generate_boston() -> None:
     for i in range(data.shape[0]):
         data[i] = np.array([float(el) for el in df.values[i][0].split(" ") if el != ""])
     x = data[:, :-1]
-    y = data[:, -1]
+    y = data[:, -1][:, None]
     generate_and_save_one_uci_dataset(UCIDataset.BOSTON, x, y)
 
 
@@ -144,7 +146,7 @@ def generate_protein() -> None:
     Link to get the CASP.csv file: https://archive.ics.uci.edu/ml/datasets/Physicochemical+Properties+of+Protein+Tertiary+Structure#
     """
     COLUMNS = [f"F{i}" for i in range(1, 10)]
-    Y_LABEL = ["RMSD"]
+    Y_LABEL = "RMSD"
     _generate_uci_from_csv(UCIDataset.PROTEIN, DATA_FILENAME, COLUMNS, Y_LABEL)
 
 
@@ -224,8 +226,8 @@ def generate_yacht() -> None:
         UCI_DATASETS_PATH / UCIDataset.YACHT.value / DATA_FILENAME, names=COLUMNS
     )
     # Split features, targets
-    x = df.drop(columns=[Y_LABEL]).values
-    y = df[Y_LABEL].values
+    x = df.drop(columns=[Y_LABEL]).to_numpy()
+    y = df[[Y_LABEL]].to_numpy()
     generate_and_save_one_uci_dataset(UCIDataset.YACHT, x, y)
 
 
