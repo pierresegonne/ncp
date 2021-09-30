@@ -25,7 +25,6 @@ def run_experiment(
     batch_size,
     has_uncertainty=True,
     drop_remainder=True,
-    evaluate_unseen_train=False,
     filetype="pdf",
     seed=0,
 ):
@@ -92,14 +91,6 @@ def run_experiment(
                 metrics.train_distances.append(distance)
                 test_inputs = dataset.test.inputs
                 test_targets = dataset.test.targets
-                if evaluate_unseen_train:
-                    unseen = ~np.isin(np.arange(len(dataset.train.inputs)), visible)
-                    test_inputs = np.concatenate(
-                        [test_inputs, dataset.train.inputs[unseen]], 0
-                    )
-                    test_targets = np.concatenate(
-                        [test_targets, dataset.train.targets[unseen]], 0
-                    )
                 likelihood, distance = evaluate_model(
                     sess,
                     graph,
