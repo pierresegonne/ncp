@@ -24,7 +24,6 @@ def run_experiment(
     visualize_after_epochs,
     batch_size,
     has_uncertainty=True,
-    drop_remainder=True,
     filetype="pdf",
     seed=0,
 ):
@@ -60,8 +59,8 @@ def run_experiment(
 
             # Shuffle, batch, drop remainder.
             indices = random.permutation(np.arange(len(visible)))
-            limit = len(visible) - batch_size + 1 if drop_remainder else len(visible)
-            for index in range(0, limit, batch_size):
+            N = len(visible)
+            for index in range(0, N, batch_size):
                 current = visible[indices[index : index + batch_size]]
                 sess.run(
                     graph.optimize,
