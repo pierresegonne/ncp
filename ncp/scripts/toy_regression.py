@@ -22,13 +22,12 @@ OURS = "ours"
 
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 200
-    _range = range(0, 5000, 10)
+    config.num_epochs = 5000
+    _range = range(0, config.num_epochs + 1, 200)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
-    config.batch_size = 10
-    config.evaluate_unseen_train = True
+    config.batch_size = 32
     config.filetype = "pdf"
     if model == "det":
         config.has_uncertainty = False
@@ -38,7 +37,7 @@ def default_schedule(model):
 def default_config(model):
     config = tools.AttrDict()
     config.num_inputs = 1
-    config.layer_sizes = [50, 50]  # [200, 200]
+    config.layer_sizes = [200, 200]
     if model == "bbb":
         config.divergence_scale = 0.1
     if model == "bbb_ncp":
@@ -50,7 +49,7 @@ def default_config(model):
     if model == "det_mix_ncp":
         config.noise_std = 0.5
         config.center_at_target = True
-    config.learning_rate = 1e-3  # 3e-4
+    config.learning_rate = 3e-4  # 3e-4
     config.weight_std = 0.1
     config.clip_gradient = 1.0
     return config
@@ -97,9 +96,9 @@ def main(args):
     # Here we define the models
     # We only want to experiment against *_ncp
     models_ = [
-        # ('bbb', models.bbb.define_graph),
+        ("bbb", models.bbb.define_graph),
         ("det", models.det.define_graph),
-        # ("bbb_ncp", models.bbb_ncp.define_graph),
+        ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     assert args.dataset in [VARGRAD, OURS]
