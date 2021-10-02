@@ -96,8 +96,8 @@ def main(args):
     # Here we define the models
     # We only want to experiment against *_ncp
     models_ = [
-        ("bbb", models.bbb.define_graph),
-        ("det", models.det.define_graph),
+        # ("bbb", models.bbb.define_graph),
+        # ("det", models.det.define_graph),
         ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
