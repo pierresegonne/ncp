@@ -20,8 +20,8 @@ from ncp import datasets, models, tools
 # TODO - check config
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 1000
-    _range = range(0, config.num_epochs + 1, 50)
+    config.num_epochs = 500
+    _range = range(0, config.num_epochs + 1, 5)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
