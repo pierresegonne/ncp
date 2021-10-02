@@ -20,12 +20,12 @@ from ncp import datasets, models, tools
 # TODO - check config
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 200
-    _range = range(0, config.num_epochs + 1, 50)
+    config.num_epochs = 10000
+    _range = range(0, config.num_epochs + 1, 200)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
-    config.batch_size = 10
+    config.batch_size = 32
     config.filetype = "pdf"
     if model == "det":
         config.has_uncertainty = False
@@ -48,7 +48,7 @@ def default_config(model):
     if model == "det_mix_ncp":
         config.noise_std = 0.5
         config.center_at_target = True
-    config.learning_rate = 1e-3  # 3e-4
+    config.learning_rate = 3e-4
     config.weight_std = 0.1
     config.clip_gradient = 1.0
     return config
