@@ -20,8 +20,8 @@ from ncp import datasets, models, tools
 # TODO - check config
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 10000
-    _range = range(0, config.num_epochs + 1, 200)
+    config.num_epochs = 1000
+    _range = range(0, config.num_epochs + 1, 50)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
@@ -97,9 +97,9 @@ def main(args):
     # Here we define the models
     # We only want to experiment against *_ncp
     models_ = [
-        ('bbb', models.bbb.define_graph),
+        # ("bbb", models.bbb.define_graph),
         ("det", models.det.define_graph),
-        ("bbb_ncp", models.bbb_ncp.define_graph),
+        # ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     if args.dataset is None:
