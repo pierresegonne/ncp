@@ -27,6 +27,7 @@ def default_schedule(model):
     config.visualize_after_epochs = _range
     config.batch_size = 16
     config.filetype = "pdf"
+    config.record_tensorboard = False
     if model == "det":
         config.has_uncertainty = False
     return config

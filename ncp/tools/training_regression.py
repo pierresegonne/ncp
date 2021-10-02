@@ -26,6 +26,7 @@ def run_experiment(
     has_uncertainty=True,
     filetype="pdf",
     seed=0,
+    record_tensorboard=True,
 ):
     logdir = os.path.expanduser(logdir)
     tf.gfile.MakeDirs(logdir)
@@ -43,17 +44,19 @@ def run_experiment(
 
     # NOTE
     # Tensorboard support
-    for var in tf.trainable_variables():
-        tf.summary.histogram(var.name, var)
+    if record_tensorboard:
+        for var in tf.trainable_variables():
+            tf.summary.histogram(var.name, var)
 
-    merged = tf.summary.merge_all()
+        merged = tf.summary.merge_all()
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         # NOTE
-        writer = tf.summary.FileWriter("./graphs", sess.graph)
+        if record_tensorboard:
+            writer = tf.summary.FileWriter("./graphs", sess.graph)
         for epoch in range(num_epochs):
             visible = np.array(visibles)
 
@@ -71,8 +74,9 @@ def run_experiment(
                     },
                 )
                 # NOTE
-                summary = sess.run(merged)
-                writer.add_summary(summary, epoch)
+                if record_tensorboard:
+                    summary = sess.run(merged)
+                    writer.add_summary(summary, epoch)
 
             if epoch in eval_after_epochs:
                 target_scale = dataset.get("target_scale", 1)
