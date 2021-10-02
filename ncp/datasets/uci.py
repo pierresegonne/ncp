@@ -38,9 +38,7 @@ UCI_DATASETS_PATH = pathlib.Path(__file__).parent.resolve() / "uci"
 def generate_and_save_one_uci_dataset(
     dataset: UCIDataset, inputs: np.ndarray, outputs: np.ndarray
 ) -> None:
-    print(
-        f"Generating {dataset.value} - [{inputs.shape}, {outputs.shape}]"
-    )
+    print(f"Generating {dataset.value} - [{inputs.shape}, {outputs.shape}]")
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(
         inputs, outputs, train_size=0.9
     )
