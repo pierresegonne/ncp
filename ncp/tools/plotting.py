@@ -88,7 +88,7 @@ def visualize_model(
             lw=0,
             s=4,
         )
-        ax.set_xlim(dataset.domain[0, index], dataset.domain[-1, index])
+        ax.set_xlim(dataset.domain[:, index].min(), dataset.domain[:, index].max())
         min_ = min(dataset.train.targets.min(), dataset.test.targets.min())
         max_ = max(dataset.train.targets.max(), dataset.test.targets.max())
         padding = 0.2 * (max_ - min_) + 1e-6
