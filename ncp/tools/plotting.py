@@ -150,8 +150,8 @@ def plot_likelihood(ax, results, key, baselines):
             continue
 
         def formatter(metrics, x, _):
-            index = min(int(x), len(metrics.num_visible[0]) - 1)
-            return metrics.num_visible[0][index]
+            index = min(int(x), len(metrics.epochs[0]) - 1)
+            return metrics.epochs[0][index]
 
         ax.xaxis.set_major_formatter(
             mpl.ticker.FuncFormatter(functools.partial(formatter, metrics))
@@ -167,7 +167,7 @@ def plot_likelihood(ax, results, key, baselines):
             alpha=0.2,
         )
         # ax.set_xlim(domain[0], domain[-1])
-        ax.set_xlim(domain[0], domain[-20])
+        # ax.set_xlim(domain[0], domain[-20])
     x_scale = ax.get_xlim()[1] - ax.get_xlim()[0]
     y_scale = ax.get_ylim()[1] - ax.get_ylim()[0]
     for name, value in baselines.items():
@@ -185,8 +185,8 @@ def plot_distance(ax, results, key, baselines):
             continue
 
         def formatter(metrics, x, _):
-            index = min(int(x), len(metrics.num_visible[0]) - 1)
-            return metrics.num_visible[0][index]
+            index = min(int(x), len(metrics.epochs[0]) - 1)
+            return metrics.epochs[0][index]
 
         ax.xaxis.set_major_formatter(
             mpl.ticker.FuncFormatter(functools.partial(formatter, metrics))
@@ -202,7 +202,7 @@ def plot_distance(ax, results, key, baselines):
             alpha=0.2,
         )
         # ax.set_xlim(domain[0], domain[-1])
-        ax.set_xlim(domain[0], domain[-20])
+        # ax.set_xlim(domain[0], domain[-20])
     x_scale = ax.get_xlim()[1] - ax.get_xlim()[0]
     y_scale = ax.get_ylim()[1] - ax.get_ylim()[0]
     for name, value in baselines.items():

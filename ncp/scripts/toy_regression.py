@@ -57,7 +57,7 @@ def default_config(model):
 
 def plot_results(args):
     load_results = lambda x: tools.load_results(
-        os.path.join(args.logdir, x) + "-*/*.npz"
+        os.path.join(args.logdir + "/" + args.dataset, x) + "-*/*.npz"
     )
     results = [
         ("BBB+NCP", load_results("bbb_ncp")),
@@ -65,6 +65,7 @@ def plot_results(args):
         ("BBB", load_results("bbb")),
         ("Det", load_results("det")),
     ]
+    tools.pretty_print_results(results)
     fig, ax = plt.subplots(ncols=4, figsize=(8, 2))
     for a in ax:
         a.xaxis.set_major_locator(plt.MaxNLocator(5))
