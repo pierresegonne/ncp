@@ -58,23 +58,6 @@ def load_numpy_dataset(directory, train_amount=None, test_amount=None):
     std = train_targets.std(0)[None] + 1e-6
     train_targets = (train_targets - mean) / std
     test_targets = (test_targets - mean) / std
-    print("train", train_inputs.shape, train_inputs.mean(0), train_inputs.std(0))
-    print("test", test_inputs.shape, test_inputs.mean(0), test_inputs.std(0))
-
-    import pandas as pd
-    import seaborn as sns
-
-    train_df = pd.DataFrame(train_inputs)
-    train_df.loc[:, "dataset"] = "train"
-    test_df = pd.DataFrame(test_inputs)
-    test_df.loc[:, "dataset"] = "test"
-    df = pd.concat([train_df, test_df], ignore_index=True)
-
-    sns.pairplot(df, hue="dataset", palette=sns.color_palette("Set2", 2))
-    import matplotlib.pyplot as plt
-
-    plt.savefig("tmp.png")
-
     train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
     test = tools.AttrDict(inputs=test_inputs, targets=test_targets)
     return tools.AttrDict(domain=domain, train=train, test=test, target_scale=std)
