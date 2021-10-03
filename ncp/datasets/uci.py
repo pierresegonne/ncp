@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
+from ncp import tools
+
 """
 UCI Datasets, with Dy = 1:
 Boston
@@ -35,12 +37,19 @@ class UCIDataset(Enum):
 UCI_DATASETS_PATH = pathlib.Path(__file__).parent.resolve() / "uci"
 
 
+def get_num_epochs(dataset: tools.AttrDict, batch_size: int) -> int:
+    N_train, N_test = dataset.train.inputs.shape[0], dataset.test.inputs.shape[0]
+    is_large_uci = N_train + N_test > 9000
+    max_batch_iterations = 1e5 if is_large_uci else 2e4
+    return int(np.ceil(max_batch_iterations / np.ceil(N_train / batch_size)))
+
+
 def generate_and_save_one_uci_dataset(
     dataset: UCIDataset, inputs: np.ndarray, outputs: np.ndarray
 ) -> None:
     print(f"Generating {dataset.value} - [{inputs.shape}, {outputs.shape}]")
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(
-        inputs, outputs, train_size=0.9
+        inputs, outputs, train_size=0.81
     )
     dataset_path = UCI_DATASETS_PATH / dataset.value
     with open(dataset_path / "-train-inputs.npy", "wb") as f:

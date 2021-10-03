@@ -5,7 +5,7 @@ import warnings
 
 import matplotlib as mpl
 
-from ncp.datasets.uci import UCIDataset
+from ncp.datasets.uci import UCIDataset, get_num_epochs
 
 mpl.use("Agg")
 import matplotlib.pyplot as plt
@@ -17,11 +17,10 @@ tf.disable_v2_behavior()
 from ncp import datasets, models, tools
 
 
-# TODO - check config
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 500
-    _range = range(0, config.num_epochs + 1, 5)
+    config.num_epochs = 2500
+    _range = range(0, config.num_epochs + 1, 500)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
@@ -37,7 +36,7 @@ def default_schedule(model):
 def default_config(model):
     config = tools.AttrDict()
     config.num_inputs = 1  # This must be overriden based on the uci experiment
-    config.layer_sizes = [200, 200]  # [200, 200]  # [50, 50]
+    config.layer_sizes = [200, 200]
     if model == "bbb":
         config.divergence_scale = 0.1
     if model == "bbb_ncp":
@@ -50,6 +49,42 @@ def default_config(model):
         config.noise_std = 0.5
         config.center_at_target = True
     config.learning_rate = 3e-4
+    config.weight_std = 0.1
+    config.clip_gradient = 1.0
+    return config
+
+
+def hp_ours_schedule(model):
+    config = tools.AttrDict()
+    config.num_epochs = -1
+    _range = range(0, config.num_epochs + 1, 500)
+    config.eval_after_epochs = _range
+    config.log_after_epochs = _range
+    config.visualize_after_epochs = _range
+    config.batch_size = 1024
+    config.filetype = "pdf"
+    config.record_tensorboard = False
+    if model == "det":
+        config.has_uncertainty = False
+    return config
+
+
+def hp_ours_config(model):
+    config = tools.AttrDict()
+    config.num_inputs = 1  # This must be overriden based on the uci experiment
+    config.layer_sizes = [50]
+    if model == "bbb":
+        config.divergence_scale = 0.1
+    if model == "bbb_ncp":
+        config.noise_std = 0.5
+        config.ncp_scale = 0.1
+        config.divergence_scale = 0
+        config.ood_std_prior = 0.1
+        config.center_at_target = True
+    if model == "det_mix_ncp":
+        config.noise_std = 0.5
+        config.center_at_target = True
+    config.learning_rate = 1e-2
     config.weight_std = 0.1
     config.clip_gradient = 1.0
     return config
@@ -97,9 +132,9 @@ def main(args):
     # Here we define the models
     # We only want to experiment against *_ncp
     models_ = [
-        # ("bbb", models.bbb.define_graph),
+        ("bbb", models.bbb.define_graph),
         ("det", models.det.define_graph),
-        # ("bbb_ncp", models.bbb_ncp.define_graph),
+        ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     if args.dataset is None:
@@ -111,12 +146,16 @@ def main(args):
         dataset = datasets.load_numpy_dataset(
             str(datasets.UCI_DATASETS_PATH / dataset_to_run) + "/"
         )
+        args.dataset = dataset_to_run
         experiments = itertools.product(range(args.seeds), models_)
         for seed, (model, define_graph) in experiments:
             schedule = globals()[args.schedule](model)
             config = globals()[args.config](model)
             # Override num_inputs based on dataset
             config.num_inputs = dataset.train.inputs.shape[1]
+            # Override epochs based on dataset
+            if schedule.num_epochs == -1:
+                schedule.num_epochs = get_num_epochs(dataset, schedule.batch_size)
             logdir = os.path.join(
                 f"{args.logdir}/{dataset_to_run}", "{}-{}".format(model, seed)
             )
