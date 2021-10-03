@@ -57,7 +57,7 @@ def default_config(model):
 def hp_ours_schedule(model):
     config = tools.AttrDict()
     config.num_epochs = -1
-    _range = range(0, config.num_epochs + 1, 500)
+    _range = range(0, int(1e6), 500)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
