@@ -15,6 +15,5 @@
 from .attrdict import AttrDict
 from .plotting import plot_distance, plot_likelihood, visualize_model
 from .printing import pretty_print_results
-
 # NOTE
 from .training_regression import load_results, run_experiment
