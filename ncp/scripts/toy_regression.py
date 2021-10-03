@@ -22,13 +22,14 @@ OURS = "ours"
 
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 5000
-    _range = range(0, config.num_epochs + 1, 200)
+    config.num_epochs = 1000
+    _range = range(0, config.num_epochs + 1, 100)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
     config.batch_size = 32
     config.filetype = "pdf"
+    config.save_model = True
     if model == "det":
         config.has_uncertainty = False
     return config
@@ -98,8 +99,8 @@ def main(args):
     # We only want to experiment against *_ncp
     models_ = [
         # ("bbb", models.bbb.define_graph),
-        # ("det", models.det.define_graph),
-        ("bbb_ncp", models.bbb_ncp.define_graph),
+        ("det", models.det.define_graph),
+        # ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     assert args.dataset in [VARGRAD, OURS]
@@ -117,6 +118,11 @@ def main(args):
         tf.gfile.MakeDirs(logdir)
         if os.path.exists(os.path.join(logdir, "metrics.npz")):
             if args.resume:
+                continue
+            elif args.plot_aistats:
+                tools.generate_aistats_plot(
+                    logdir, define_graph(config), dataset, **schedule, seed=seed
+                )
                 continue
             raise RuntimeError("The log directory is not empty.")
         with open(os.path.join(logdir, "schedule.yaml"), "w") as file_:
@@ -140,6 +146,7 @@ if __name__ == "__main__":
     parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--resume", action="store_true", default=False)
     parser.add_argument("--replot", action="store_true", default=False)
+    parser.add_argument("--plot_aistats", action="store_true", default=False)
     parser.add_argument("--dataset", default=VARGRAD, choices=[VARGRAD, OURS])
     args = parser.parse_args()
     args.logdir = os.path.expanduser(args.logdir)

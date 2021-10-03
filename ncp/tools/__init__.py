@@ -13,6 +13,7 @@
 # limitations under the License.
 
 from .attrdict import AttrDict
+from .plot_aistats import generate_aistats_plot
 from .plotting import plot_distance, plot_likelihood, visualize_model
 from .printing import pretty_print_results
 # NOTE

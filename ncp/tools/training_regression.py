@@ -27,6 +27,7 @@ def run_experiment(
     filetype="pdf",
     seed=0,
     record_tensorboard=True,
+    save_model=False,
 ):
     logdir = os.path.expanduser(logdir)
     tf.gfile.MakeDirs(logdir)
@@ -52,6 +53,8 @@ def run_experiment(
 
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
+    if save_model:
+        saver = tf.train.Saver()
     with tf.Session(config=config) as sess:
         sess.run(tf.global_variables_initializer())
         # NOTE
@@ -115,6 +118,9 @@ def run_experiment(
                     "test rmse {:.2f}".format(metrics.test_distances[-1]),
                 )
                 sys.stdout.flush()
+                if save_model:
+                    # Save the variables to disk.
+                    saver.save(sess, os.path.join(logdir, f"model_{epoch}.ckpt"))
 
             if epoch in visualize_after_epochs:
                 filename = os.path.join(logdir, "epoch-{}.{}".format(epoch, filetype))
