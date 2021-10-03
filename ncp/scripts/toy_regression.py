@@ -30,7 +30,7 @@ def default_schedule(model):
     config.batch_size = 32
     config.filetype = "pdf"
     config.save_model = True
-    config.record_tensorboard =
+    config.record_tensorboard = False
     if model == "det":
         config.has_uncertainty = False
     return config
