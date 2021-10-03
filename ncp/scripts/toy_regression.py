@@ -22,14 +22,15 @@ OURS = "ours"
 
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 1000
-    _range = range(0, config.num_epochs + 1, 100)
+    config.num_epochs = 3000
+    _range = range(0, config.num_epochs + 1, 500)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
     config.batch_size = 32
     config.filetype = "pdf"
     config.save_model = True
+    config.record_tensorboard =
     if model == "det":
         config.has_uncertainty = False
     return config
@@ -52,7 +53,7 @@ def default_config(model):
         config.center_at_target = True
     config.learning_rate = 3e-4  # 3e-4
     config.weight_std = 0.1
-    config.clip_gradient = 1.0
+    config.clip_gradient = 100
     return config
 
 
@@ -98,9 +99,9 @@ def main(args):
     # Here we define the models
     # We only want to experiment against *_ncp
     models_ = [
-        # ("bbb", models.bbb.define_graph),
+        ("bbb", models.bbb.define_graph),
         ("det", models.det.define_graph),
-        # ("bbb_ncp", models.bbb_ncp.define_graph),
+        ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     assert args.dataset in [VARGRAD, OURS]
