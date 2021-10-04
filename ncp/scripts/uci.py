@@ -125,6 +125,13 @@ def plot_results(args):
 
 def main(args):
     if args.replot:
+        # Replot only once at a time
+        assert args.dataset is not None
+        assert args.dataset in [ds.value for ds in UCIDataset]
+        dataset = datasets.load_numpy_dataset(
+            str(datasets.UCI_DATASETS_PATH / args.dataset) + "/"
+        )
+        print("target_scale: ", dataset.target_scale)
         plot_results(args)
         return
     warnings.filterwarnings("ignore", category=DeprecationWarning)  # TensorFlow.
