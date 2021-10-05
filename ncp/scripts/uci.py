@@ -151,7 +151,7 @@ def main(args):
         datasets_to_run = [args.dataset]
     for dataset_to_run in datasets_to_run:
         dataset = datasets.load_numpy_dataset(
-            str(datasets.UCI_DATASETS_PATH / dataset_to_run) + "/"
+            datasets.UCI_DATASETS_PATH / dataset_to_run
         )
         args.dataset = dataset_to_run
         # NOTE to do shifted split, we could just override the seeds number here ?

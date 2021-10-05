@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
+from pathlib import Path
 
 import numpy as np
 import tensorflow.compat.v1 as tf
@@ -22,20 +22,20 @@ tf.disable_v2_behavior()
 from ncp import tools
 
 
-def load_numpy_dataset(directory, train_amount=None, test_amount=None):
+def load_numpy_dataset(path_directory: Path, train_amount=None, test_amount=None):
     random = np.random.RandomState(0)
     # Train
-    filepath = os.path.expanduser(directory + "-train-inputs.npy")
+    filepath = path_directory / "-train-inputs.npy"
     with tf.gfile.Open(filepath, "rb") as file_:
         train_inputs = np.load(file_).astype(np.float32)
-    filepath = directory + "-train-targets.npy"
+    filepath = path_directory / "-train-targets.npy"
     with tf.gfile.Open(filepath, "rb") as file_:
         train_targets = np.load(file_).astype(np.float32)
     # Test
-    filepath = directory + "-test-inputs.npy"
+    filepath = path_directory / "-test-inputs.npy"
     with tf.gfile.Open(filepath, "rb") as file_:
         test_inputs = np.load(file_).astype(np.float32)
-    filepath = directory + "-test-targets.npy"
+    filepath = path_directory / "-test-targets.npy"
     with tf.gfile.Open(filepath, "rb") as file_:
         test_targets = np.load(file_).astype(np.float32)
 
@@ -63,12 +63,14 @@ def load_numpy_dataset(directory, train_amount=None, test_amount=None):
     return tools.AttrDict(domain=domain, train=train, test=test, target_scale=std)
 
 
-def load_numpy_dataset_shifted_split(directory, dim_idx: int) -> tools.AttrDict:
+def load_numpy_dataset_shifted_split(
+    path_directory: Path, dim_idx: int
+) -> tools.AttrDict:
     """
     Additionnal split test samples are added to already existing test samples
     That's not ideal but that's the way it's done in sggm
     """
-    dataset = load_numpy_dataset(directory)
+    dataset = load_numpy_dataset(path_directory)
     assert dim_idx >= 0
     assert dim_idx < dataset.train.inputs.shape[1]
     train_inputs, train_targets = dataset.train.inputs, dataset.train.targets

@@ -1,5 +1,5 @@
-import pathlib
 from enum import Enum
+from pathlib import Path
 from typing import List, Optional
 
 import numpy as np
@@ -34,7 +34,7 @@ class UCIDataset(Enum):
     YACHT = "yacht"
 
 
-UCI_DATASETS_PATH = pathlib.Path(__file__).parent.resolve() / "uci"
+UCI_DATASETS_PATH = Path(__file__).parent.resolve() / "uci"
 
 
 def get_num_epochs(dataset: tools.AttrDict, batch_size: int) -> int:
@@ -257,4 +257,6 @@ def generate_uci_datasets() -> None:
 
 
 if __name__ == "__main__":
+    print(UCI_DATASETS_PATH / "yacht")
+    exit()
     generate_uci_datasets()
