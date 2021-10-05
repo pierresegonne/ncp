@@ -84,29 +84,10 @@ def load_numpy_dataset_shifted_split(directory, dim_idx: int) -> tools.AttrDict:
         )
     )
 
-    import pandas as pd
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
-    def gen_df(train_inputs, test_inputs):
-        df_train = pd.DataFrame(train_inputs)
-        df_train.loc[:, "dataset"] = "train"
-        df_test = pd.DataFrame(test_inputs)
-        df_test.loc[:, "dataset"] = "test"
-        return pd.concat((df_train, df_test), ignore_index=True)
-
-    df = gen_df(train_inputs, test_inputs)
-    sns.pairplot(df, hue="dataset")
-    plt.savefig("tmp1.png")
-
     test_inputs = np.concatenate((test_inputs, train_inputs[split_indices]), axis=0)
     test_targets = np.concatenate((test_targets, train_targets[split_indices]), axis=0)
     train_inputs = train_inputs[non_split_indices]
     train_targets = train_targets[non_split_indices]
-
-    df = gen_df(train_inputs, test_inputs)
-    sns.pairplot(df, hue="dataset")
-    plt.savefig("tmp2.png")
 
     domain = test_inputs[::10]  # Subsample inputs for visualization.
     train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
@@ -114,9 +95,3 @@ def load_numpy_dataset_shifted_split(directory, dim_idx: int) -> tools.AttrDict:
     return tools.AttrDict(
         domain=domain, train=train, test=test, target_scale=dataset.target_scale
     )
-
-
-if __name__ == "__main__":
-    from .uci import UCI_DATASETS_PATH
-
-    load_numpy_dataset_shifted_split(str(UCI_DATASETS_PATH / "yacht") + "/", 1)
