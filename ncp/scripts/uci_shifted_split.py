@@ -19,8 +19,8 @@ from ncp import datasets, models, tools
 
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 2500
-    _range = range(0, config.num_epochs + 1, 500)
+    config.num_epochs = 1000
+    _range = range(0, config.num_epochs + 1, 200)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
     config.visualize_after_epochs = _range
@@ -154,6 +154,8 @@ def main(args):
             datasets.UCI_DATASETS_PATH / dataset_to_run
         )
         args.dataset = dataset_to_run
+        # Seeds become the number of input dims
+        args.seeds = dataset.train.inputs.shape[1]
         experiments = itertools.product(range(args.seeds), models_)
         for seed, (model, define_graph) in experiments:
             schedule = globals()[args.schedule](model)
@@ -163,6 +165,10 @@ def main(args):
             # Override epochs based on dataset
             if schedule.num_epochs == -1:
                 schedule.num_epochs = get_num_epochs(dataset, schedule.batch_size)
+            # Redefine dataset with desired split
+            dataset = datasets.load_numpy_dataset_shifted_split(
+                datasets.UCI_DATASETS_PATH / dataset_to_run, dim_idx=seed
+            )
             logdir = os.path.join(
                 f"{args.logdir}/{dataset_to_run}", "{}-{}".format(model, seed)
             )
@@ -189,7 +195,6 @@ if __name__ == "__main__":
     parser.add_argument("--schedule", default="default_schedule")
     parser.add_argument("--config", default="default_config")
     parser.add_argument("--logdir", required=True)
-    parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--resume", action="store_true", default=False)
     parser.add_argument("--replot", action="store_true", default=False)
     parser.add_argument(

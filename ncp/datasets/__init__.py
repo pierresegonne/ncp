@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .numpy_dataset import load_numpy_dataset
+from .numpy_dataset import load_numpy_dataset, load_numpy_dataset_shifted_split
 from .toy_ours import generate_toy_ours_dataset
 from .toy_vargrad import generate_vargrad_dataset
 from .uci import UCI_DATASETS_PATH, UCIDataset
