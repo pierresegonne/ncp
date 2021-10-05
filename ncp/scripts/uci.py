@@ -154,10 +154,13 @@ def main(args):
             str(datasets.UCI_DATASETS_PATH / dataset_to_run) + "/"
         )
         args.dataset = dataset_to_run
+        # NOTE to do shifted split, we could just override the seeds number here ?
         experiments = itertools.product(range(args.seeds), models_)
         for seed, (model, define_graph) in experiments:
             schedule = globals()[args.schedule](model)
             config = globals()[args.config](model)
+            # NOTE and then call a numpy shifted dataset with seed #
+            # For that we would need to generate targets / inputs array saves beforehand
             # Override num_inputs based on dataset
             config.num_inputs = dataset.train.inputs.shape[1]
             # Override epochs based on dataset

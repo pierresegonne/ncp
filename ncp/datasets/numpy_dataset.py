@@ -23,9 +23,9 @@ from ncp import tools
 
 
 def load_numpy_dataset(directory, train_amount=None, test_amount=None):
+    random = np.random.RandomState(0)
     # Train
     filepath = os.path.expanduser(directory + "-train-inputs.npy")
-    random = np.random.RandomState(0)
     with tf.gfile.Open(filepath, "rb") as file_:
         train_inputs = np.load(file_).astype(np.float32)
     filepath = directory + "-train-targets.npy"
@@ -61,3 +61,62 @@ def load_numpy_dataset(directory, train_amount=None, test_amount=None):
     train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
     test = tools.AttrDict(inputs=test_inputs, targets=test_targets)
     return tools.AttrDict(domain=domain, train=train, test=test, target_scale=std)
+
+
+def load_numpy_dataset_shifted_split(directory, dim_idx: int) -> tools.AttrDict:
+    """
+    Additionnal split test samples are added to already existing test samples
+    That's not ideal but that's the way it's done in sggm
+    """
+    dataset = load_numpy_dataset(directory)
+    assert dim_idx >= 0
+    assert dim_idx < dataset.train.inputs.shape[1]
+    train_inputs, train_targets = dataset.train.inputs, dataset.train.targets
+    test_inputs, test_targets = dataset.test.inputs, dataset.test.targets
+
+    dim_col_sorted_indices = np.argsort(train_inputs[:, dim_idx])
+    N = dim_col_sorted_indices.shape[0]
+    split_indices = dim_col_sorted_indices[int(N / 3) : int((2 * N) / 3)]
+    non_split_indices = np.concatenate(
+        (
+            dim_col_sorted_indices[: int(N / 3)],
+            dim_col_sorted_indices[int((2 * N) / 3) :],
+        )
+    )
+
+    import pandas as pd
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    def gen_df(train_inputs, test_inputs):
+        df_train = pd.DataFrame(train_inputs)
+        df_train.loc[:, "dataset"] = "train"
+        df_test = pd.DataFrame(test_inputs)
+        df_test.loc[:, "dataset"] = "test"
+        return pd.concat((df_train, df_test), ignore_index=True)
+
+    df = gen_df(train_inputs, test_inputs)
+    sns.pairplot(df, hue="dataset")
+    plt.savefig("tmp1.png")
+
+    test_inputs = np.concatenate((test_inputs, train_inputs[split_indices]), axis=0)
+    test_targets = np.concatenate((test_targets, train_targets[split_indices]), axis=0)
+    train_inputs = train_inputs[non_split_indices]
+    train_targets = train_targets[non_split_indices]
+
+    df = gen_df(train_inputs, test_inputs)
+    sns.pairplot(df, hue="dataset")
+    plt.savefig("tmp2.png")
+
+    domain = test_inputs[::10]  # Subsample inputs for visualization.
+    train = tools.AttrDict(inputs=train_inputs, targets=train_targets)
+    test = tools.AttrDict(inputs=test_inputs, targets=test_targets)
+    return tools.AttrDict(
+        domain=domain, train=train, test=test, target_scale=dataset.target_scale
+    )
+
+
+if __name__ == "__main__":
+    from .uci import UCI_DATASETS_PATH
+
+    load_numpy_dataset_shifted_split(str(UCI_DATASETS_PATH / "yacht") + "/", 1)

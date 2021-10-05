@@ -47,11 +47,11 @@ def get_num_epochs(dataset: tools.AttrDict, batch_size: int) -> int:
 def generate_and_save_one_uci_dataset(
     dataset: UCIDataset, inputs: np.ndarray, outputs: np.ndarray
 ) -> None:
+    dataset_path = UCI_DATASETS_PATH / dataset.value
     print(f"Generating {dataset.value} - [{inputs.shape}, {outputs.shape}]")
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(
         inputs, outputs, train_size=0.81
     )
-    dataset_path = UCI_DATASETS_PATH / dataset.value
     with open(dataset_path / "-train-inputs.npy", "wb") as f:
         np.save(f, train_inputs)
     with open(dataset_path / "-train-targets.npy", "wb") as f:
@@ -242,6 +242,10 @@ def generate_uci_datasets() -> None:
     """
     Processes the uci datasets to generate the respective numpy datasets folders
     Format: folder with :/
+    -* no train/test split
+    -inputs.npy
+    -targets.npy
+    -* train/test split
     -train-inputs.npy
     -train-targets.npy
     -test-inputs.npy
