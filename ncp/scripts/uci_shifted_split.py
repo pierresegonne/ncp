@@ -143,7 +143,8 @@ def main(args):
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     if args.dataset is None:
-        datasets_to_run = [ds.value for ds in UCIDataset]
+        # FIXME
+        datasets_to_run = [ds.value for ds in UCIDataset if ds.value != "boston"]
     else:
         assert args.dataset in [ds.value for ds in UCIDataset]
         datasets_to_run = [args.dataset]
@@ -161,10 +162,12 @@ def main(args):
             # Override num_inputs based on dataset
             config.num_inputs = dataset.train.inputs.shape[1]
             # Override epochs based on dataset
-            if (schedule.num_epochs == -1):
+            if schedule.num_epochs == -1:
                 # Only set the number of epochs before touching the train / test split
                 if i == 0:
-                    num_epochs_for_dataset = get_num_epochs(dataset, schedule.batch_size)
+                    num_epochs_for_dataset = get_num_epochs(
+                        dataset, schedule.batch_size
+                    )
                 schedule.num_epochs = num_epochs_for_dataset
             # Redefine dataset with desired split
             dataset = datasets.load_numpy_dataset_shifted_split(
