@@ -14,7 +14,7 @@ def generate_toy_ours_dataset():
 
     training_range = [0, 10]
     testing_range = [0, 10]
-    N_train = 625
+    N_train = 50
     N_test = 500
     x_train = np.random.uniform(
         low=training_range[0], high=training_range[1], size=N_train
@@ -41,9 +41,21 @@ def generate_toy_ours_dataset():
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
+    from matplotlib.collections import LineCollection
     from sklearn.neural_network import MLPRegressor
 
     dataset = generate_toy_ours_dataset()
+    ood_inputs = dataset.train.inputs + 0.5 * np.random.randn(
+        *dataset.train.inputs.shape
+    )
+    N = dataset.train.inputs.shape[0]
+    lines = [
+        [
+            (dataset.train.inputs[i][0], dataset.train.targets[i][0]),
+            (ood_inputs[i][0], dataset.train.targets[i][0]),
+        ]
+        for i in range(N)
+    ]
 
     regr = MLPRegressor(hidden_layer_sizes=(50, 50), random_state=1, max_iter=500).fit(
         dataset.train.inputs, dataset.train.targets
@@ -54,6 +66,8 @@ if __name__ == "__main__":
     ax.plot(dataset.test.inputs, dataset.test.targets, "o", label="test")
     ax.plot(dataset.test.inputs, pred, "o", color="pink", label="pred")
     ax.plot(dataset.train.inputs, dataset.train.targets, "o", label="train")
+    ax.plot(ood_inputs, dataset.train.targets, "o", color="red", label="OOD")
+    ax.add_collection(LineCollection(lines, color="black"))
     ax.legend()
 
     plt.show()
