@@ -155,14 +155,17 @@ def main(args):
         # Seeds become the number of input dims
         args.seeds = dataset.train.inputs.shape[1]
         experiments = itertools.product(range(args.seeds), models_)
-        for seed, (model, define_graph) in experiments:
+        for i, (seed, (model, define_graph)) in enumerate(experiments):
             schedule = globals()[args.schedule](model)
             config = globals()[args.config](model)
             # Override num_inputs based on dataset
             config.num_inputs = dataset.train.inputs.shape[1]
             # Override epochs based on dataset
-            if schedule.num_epochs == -1:
-                schedule.num_epochs = get_num_epochs(dataset, schedule.batch_size)
+            if (schedule.num_epochs == -1):
+                # Only set the number of epochs before touching the train / test split
+                if i == 0:
+                    num_epochs_for_dataset = get_num_epochs(dataset, schedule.batch_size)
+                schedule.num_epochs = num_epochs_for_dataset
             # Redefine dataset with desired split
             dataset = datasets.load_numpy_dataset_shifted_split(
                 datasets.UCI_DATASETS_PATH / dataset_to_run, dim_idx=seed
