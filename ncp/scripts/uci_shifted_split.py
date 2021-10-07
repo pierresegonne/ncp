@@ -143,11 +143,17 @@ def main(args):
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
     if args.dataset is None:
-        # FIXME
-        datasets_to_run = [ds.value for ds in UCIDataset if ds.value != "boston"]
+        datasets_to_run = [ds.value for ds in UCIDataset]
     else:
         assert args.dataset in [ds.value for ds in UCIDataset]
         datasets_to_run = [args.dataset]
+    # FIXME
+    datasets_to_run = [
+        UCIDataset.SUPERCONDUCT.value,
+        UCIDataset.WINE_RED.value,
+        UCIDataset.WINE_WHITE.value,
+        UCIDataset.YACHT.value,
+    ]
     for dataset_to_run in datasets_to_run:
         dataset = datasets.load_numpy_dataset(
             datasets.UCI_DATASETS_PATH / dataset_to_run
