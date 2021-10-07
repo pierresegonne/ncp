@@ -76,7 +76,9 @@ def main(args):
         columns_iterables = [methods, kinds]
 
         _df = pd.DataFrame(
-            index=pd.MultiIndex.from_product(index_iterables),
+            index=pd.MultiIndex.from_product(
+                index_iterables, names=["experiment_name", "metric"]
+            ),
             columns=pd.MultiIndex.from_product(columns_iterables),
         )
         for i, m in enumerate(methods):
