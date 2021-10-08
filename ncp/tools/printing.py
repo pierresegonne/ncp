@@ -13,4 +13,11 @@ def pretty_print_results(results) -> None:
             mean_test_rmse = get_mean_metric("test_distances")
             print("** Test likelihoods **", mean_test_likelihood)
             print("** Test RMSE **", mean_test_rmse)
+            # Backward compatibility
+            if "test_variances" in res[1]:
+                mean_test_rmse_variances = get_mean_metric("test_variances")
+                print("** Test RMSE var **", mean_test_rmse_variances)
+            if "test_samples_distances" in res[1]:
+                mean_test_rmse_samples_rmse = get_mean_metric("test_samples_distances")
+                print("** Test RMSE samples **", mean_test_rmse_samples_rmse)
             print("\n")

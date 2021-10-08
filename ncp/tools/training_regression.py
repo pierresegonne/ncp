@@ -39,6 +39,8 @@ def run_experiment(
         train_distances=[],
         test_likelihoods=[],
         test_distances=[],
+        test_variances=[],
+        test_samples_distances=[],
     )
     # NOTE
     visibles = [i for i in range(len(dataset.train.inputs))]
@@ -85,7 +87,7 @@ def run_experiment(
                 target_scale = dataset.get("target_scale", 1)
                 # NOTE
                 metrics.epochs.append(epoch)
-                likelihood, distance = evaluate_model(
+                likelihood, distance, _, _ = evaluate_model(
                     sess,
                     graph,
                     has_uncertainty,
@@ -97,7 +99,7 @@ def run_experiment(
                 metrics.train_distances.append(distance)
                 test_inputs = dataset.test.inputs
                 test_targets = dataset.test.targets
-                likelihood, distance = evaluate_model(
+                likelihood, distance, variance, samples_distance = evaluate_model(
                     sess,
                     graph,
                     has_uncertainty,
@@ -107,6 +109,8 @@ def run_experiment(
                 )
                 metrics.test_likelihoods.append(likelihood)
                 metrics.test_distances.append(distance)
+                metrics.test_variances.append(variance)
+                metrics.test_samples_distances.append(samples_distance)
 
             if epoch in log_after_epochs:
                 print(
@@ -137,7 +141,12 @@ def run_experiment(
 def evaluate_model(
     sess, graph, has_uncertainty, inputs, targets, target_scale, batch_size=100
 ):
-    likelihoods, squared_distances = [], []
+    likelihoods, squared_distances, squared_variances, squared_samples_distances = (
+        [],
+        [],
+        [],
+        [],
+    )
     for index in range(0, len(inputs), batch_size):
         target = targets[index : index + batch_size]
         mean, noise, uncertainty = sess.run(
@@ -149,6 +158,9 @@ def evaluate_model(
             std = np.sqrt(noise ** 2 + uncertainty ** 2 + 1e-8)
         else:
             std = noise
+        squared_variances.append((std ** 2 - (target - mean) ** 2) ** 2)
+        samples = np.random.normal(loc=mean, scale=std)
+        squared_samples_distances.append((target_scale * (target - samples)) ** 2)
         # Subtracting the log target scale is equivalent to evaluting the
         # log-probability of the unnormalized targets under the scaled predicted
         # mean and standard deviation.
@@ -159,7 +171,11 @@ def evaluate_model(
         likelihoods.append(likelihood)
     likelihood = np.concatenate(likelihoods, 0).sum(1).mean(0)
     distance = np.sqrt(np.concatenate(squared_distances, 0).sum(1).mean(0))
-    return likelihood, distance
+    variance = np.sqrt(np.concatenate(squared_variances, 0).sum(1).mean(0))
+    samples_distance = np.sqrt(
+        np.concatenate(squared_samples_distances, 0).sum(1).mean(0)
+    )
+    return likelihood, distance, variance, samples_distance
 
 
 def load_results(pattern):
