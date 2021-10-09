@@ -65,11 +65,28 @@ def main(args):
                             -1
                         ],
                     ],
+                    [
+                        np.stack(results[i][1]["test_variances"]).mean(axis=0)[-1],
+                        np.stack(results[i][1]["test_variances"]).std(axis=0)[-1],
+                    ],
+                    [
+                        (np.stack(results[i][1]["test_samples_distances"]) / scl).mean(
+                            axis=0
+                        )[-1],
+                        (np.stack(results[i][1]["test_samples_distances"]) / scl).std(
+                            axis=0
+                        )[-1],
+                    ],
                 ]
             )
 
         experiments = [f"uci_{dataset_to_run}{'_shifted' if is_shifted else ''}"]
-        metrics = ["test_expected_log_likelihood↑", "test_mean_fit_rmse↓"]
+        metrics = [
+            "test_expected_log_likelihood↑",
+            "test_mean_fit_rmse↓",
+            "test_variance_fit_rmse↓",
+            "test_sample_fit_rmse↓",
+        ]
         index_iterables = [experiments, metrics]
         methods = ["BBB+NCP", "BBB", "Det"]
         kinds = ["mean", "std"]
