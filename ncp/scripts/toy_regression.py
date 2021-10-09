@@ -120,11 +120,13 @@ def main(args):
         if os.path.exists(os.path.join(logdir, "metrics.npz")):
             if args.resume:
                 continue
-            elif args.plot_aistats:
-                tools.generate_aistats_plot(
+            elif args.save_outputs_for_aistats_plot:
+                tf.reset_default_graph()
+                tf.set_random_seed(seed)
+                tools.save_outputs_for_aistats_plot(
                     logdir, define_graph(config), dataset, **schedule, seed=seed
                 )
-                continue
+                break
             raise RuntimeError("The log directory is not empty.")
         with open(os.path.join(logdir, "schedule.yaml"), "w") as file_:
             yaml.dump(schedule.copy(), file_)
@@ -147,7 +149,9 @@ if __name__ == "__main__":
     parser.add_argument("--seeds", type=int, default=5)
     parser.add_argument("--resume", action="store_true", default=False)
     parser.add_argument("--replot", action="store_true", default=False)
-    parser.add_argument("--plot_aistats", action="store_true", default=False)
+    parser.add_argument(
+        "--save_outputs_for_aistats_plot", action="store_true", default=False
+    )
     parser.add_argument("--dataset", default=VARGRAD, choices=[VARGRAD, OURS])
     args = parser.parse_args()
     args.logdir = os.path.expanduser(args.logdir)
