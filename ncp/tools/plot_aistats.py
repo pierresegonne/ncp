@@ -35,10 +35,11 @@ def save_outputs_for_aistats_plot(
         epoch = get_latest_epoch(logdir)
         saver.restore(sess, os.path.join(logdir, f"model_{epoch}.ckpt"))
         means, noises, uncertainties = [], [], []
-        for index in range(0, len(dataset.domain), batch_size):
+        domain = np.linspace(-4, 14, 10000)[:, None]
+        for index in range(0, len(domain), batch_size):
             mean, noise, uncertainty = sess.run(
                 [graph.data_mean, graph.data_noise, graph.data_uncertainty],
-                {graph.inputs: dataset.domain[index : index + batch_size]},
+                {graph.inputs: domain[index : index + batch_size]},
             )
             means.append(mean)
             noises.append(noise)
@@ -49,7 +50,7 @@ def save_outputs_for_aistats_plot(
             uncertainty = np.concatenate(uncertainties, 0)
         std = np.sqrt(noise ** 2 + uncertainty ** 2) if has_uncertainty else noise
         outputs_for_aistats_plot = {
-            "inputs": dataset.domain[:, 0],
+            "inputs": domain[:, 0],
             "mean": mean[:, 0],
             "std": std[:, 0],
         }

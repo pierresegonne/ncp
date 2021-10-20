@@ -127,11 +127,11 @@ def run_experiment(
                     saver.save(sess, os.path.join(logdir, f"model_{epoch}.ckpt"))
 
             # FIXME
-            # if epoch in visualize_after_epochs:
-            #     filename = os.path.join(logdir, "epoch-{}.{}".format(epoch, filetype))
-            #     plotting.visualize_model(
-            #         filename, sess, graph, has_uncertainty, dataset, visibles
-            #     )
+            if epoch in visualize_after_epochs:
+                filename = os.path.join(logdir, "epoch-{}.{}".format(epoch, filetype))
+                plotting.visualize_model(
+                    filename, sess, graph, has_uncertainty, dataset, visibles
+                )
 
     metrics = {key: np.array(value) for key, value in metrics.items()}
     np.savez_compressed(os.path.join(logdir, "metrics.npz"), **metrics)

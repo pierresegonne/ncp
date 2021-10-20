@@ -22,7 +22,7 @@ OURS = "ours"
 
 def default_schedule(model):
     config = tools.AttrDict()
-    config.num_epochs = 3000
+    config.num_epochs = 5000
     _range = range(0, config.num_epochs + 1, 500)
     config.eval_after_epochs = _range
     config.log_after_epochs = _range
@@ -43,8 +43,8 @@ def default_config(model):
     if model == "bbb":
         config.divergence_scale = 0.1
     if model == "bbb_ncp":
-        config.noise_std = 0.5
-        config.ncp_scale = 0.1
+        config.noise_std = 1.5
+        config.ncp_scale = 1.5
         config.divergence_scale = 0
         config.ood_std_prior = 0.1
         config.center_at_target = True
@@ -100,7 +100,7 @@ def main(args):
     # We only want to experiment against *_ncp
     models_ = [
         ("bbb", models.bbb.define_graph),
-        ("det", models.det.define_graph),
+        # ("det", models.det.define_graph),
         ("bbb_ncp", models.bbb_ncp.define_graph),
         # ('det_mix_ncp', models.det_mix_ncp.define_graph),
     ]
